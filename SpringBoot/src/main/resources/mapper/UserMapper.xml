@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.douyiyuan.first.mapper.UserMapper">
+
+    <select id="findPage" resultType="com.douyiyuan.first.entity.User">
+        SELECT user.*,role.name as roleName
+        FROM user
+        LEFT JOIN role
+        on user.role = role.flag
+        <where>
+            <if test="name != null and name != ''">
+                user.name like concat ('%',#{name},'%')
+            </if>
+        </where>
+        ORDER BY user.id desc
+    </select>
+</mapper>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.douyiyuan.first.mapper.CartMapper">
+
+    <select id="findPage" resultType="com.douyiyuan.first.entity.Cart">
+        SELECT c.*, u.name as username, u.nickname, g.code,g.name as goodsName,g.picture,g.price
+        FROM cart c
+        left join user u
+        on c.user_id = u.id
+        left join goods g
+        on c.goods_id = g.id
+        <where>
+            <if test="name!=null and name!=''">
+                and g.name like concat ('%',#{name},'%')
+            </if>
+            <if test="role != 'ROLE_ADMIN'">
+                and u.id = #{userId}
+            </if>
+        </where>
+    </select>
+
+    <select id="findListByIds" resultType="com.douyiyuan.first.entity.Cart">
+        SELECT c.*, u.name as username, u.nickname, g.code,g.name as goodsName,g.picture,g.price
+        FROM cart c
+        left join user u
+        on c.user_id = u.id
+        left join goods g
+        on c.goods_id = g.id
+        <where>
+            c.id in 
+            <foreach collection="ids" item="item" index="index" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </where>
+    </select>
+</mapper>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.douyiyuan.first.mapper.OrdersMapper">
+
+    <select id="findPage" resultType="com.douyiyuan.first.entity.Orders">
+        SELECT o.*, u.name as username, u.nickname
+        FROM orders o
+        left join user u
+        on o.user_id = u.id
+        <where>
+            <if test="no != null and no != ''">
+               and o.no = #{no}
+            </if>
+            <if test="role != 'ROLE_ADMIN'">
+                and u.id = #{userId}
+            </if>
+        </where>
+        order by o.id desc
+    </select>
+
+    <select id="findGoodsByOrderId" resultType="com.douyiyuan.first.entity.OrdersGoods">
+        select og.*, g.name as goodsName, g.code, g.picture, g.price, g.store, g.gross_weight, g.place
+        from orders_goods og
+        left join goods g
+        on og.goods_id = g.id
+        where og.orders_id = #{orderId}
+    </select>
+</mapper>

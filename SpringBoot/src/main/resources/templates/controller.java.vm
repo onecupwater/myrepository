@@ -1,0 +1,112 @@
+package ${package.Controller};
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.douyiyuan.first.common.Result;
+import org.springframework.web.bind.annotation.RequestMapping;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.springframework.web.bind.annotation.*;
+import javax.annotation.Resource;
+import java.util.List;
+
+import $!{package.Service}.$!{table.serviceName};
+import ${package.Entity}.${entity};
+
+import org.springframework.web.bind.annotation.RestController;
+
+#if(${superControllerClassPackage})
+import ${superControllerClassPackage};
+#end
+
+/**
+ * <p>
+ * $!{table.comment} 前端控制器
+ * </p>
+ *
+ * @author ${author}
+ * @since ${date}
+ */
+@RestController
+@RequestMapping("#if(${package.ModuleName})/${package.ModuleName}#end/#if(${controllerMappingHyphenStyle})${controllerMappingHyphen}#else${table.entityPath}#end")
+#if(${kotlin})
+class ${table.controllerName}#if(${superControllerClass}) : ${superControllerClass}()#end
+
+#else
+#if(${superControllerClass})
+public class ${table.controllerName} extends ${superControllerClass} {
+#else
+public class ${table.controllerName} {
+#end
+
+    @Resource
+    private ${table.serviceName} ${table.entityPath}Service;
+
+    /**
+     * 查询所有
+     * @return
+     */
+    @GetMapping
+    public Result findAll() {
+        return Result.success(${table.entityPath}Service.list());
+    }
+
+    /**
+     * 根据id查询
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    public Result findOne(@PathVariable Integer id) {
+        return Result.success(${table.entityPath}Service.getById(id));
+    }
+
+    /**
+     * 分页查询
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    @GetMapping("/page")
+    public Result findPage(@RequestParam Integer pageNum,
+                                    @RequestParam Integer pageSize) {
+        //分页查询如果没有条件，就把new QueryWrapper<>()删了，有条件就在queryWrapper变量加条件
+        QueryWrapper<${entity}> queryWrapper = new QueryWrapper<>();
+        //queryWrapper加条件
+
+        queryWrapper.orderByDesc("id");
+        Page<${entity}> objectPage = new Page<>(pageNum, pageSize);
+        Page<${entity}> page = ${table.entityPath}Service.page(objectPage, queryWrapper);
+        return Result.success(page);
+    }
+
+    /**
+     * 新增与修改
+     * @param ${table.entityPath}
+     * @return
+     */
+    @PostMapping("save")
+    public Result save(@RequestBody ${entity} ${table.entityPath}) {
+        return Result.success(${table.entityPath}Service.saveOrUpdate(${table.entityPath}));
+        }
+
+    /**
+     * 根据id删除
+     * @param id
+     * @return
+     */
+    @DeleteMapping("delete/{id}")
+    public Result delete(@PathVariable Integer id) {
+        return Result.success(${table.entityPath}Service.removeById(id));
+        }
+
+    /**
+     * 批量删除，因为前端的axios传 "[1,2,3]" 这样的参数只能用post方式来传，不能用delete方式来传
+     * @param ids
+     * @return
+     */
+    @PostMapping("removeBatchByIds")
+    public Result removeBatchByIds(@RequestBody List<Integer> ids){
+        return Result.success(${table.entityPath}Service.removeBatchByIds(ids));
+        }
+}
+
+#end
